@@ -27,6 +27,7 @@ public:
         return modulus() < other.modulus();
     }
 };
+
 void shuffle(std::vector<Complex>& vec) {
     std::srand(std::time(0));
     for (size_t i = 0; i < vec.size(); ++i) {
@@ -50,6 +51,7 @@ void remove(std::vector<Complex>& vec, const Complex& num) {
 void unique(std::vector<Complex>& vec) {
     vec.erase(std::unique(vec.begin(), vec.end()), vec.end());
 }
+
 void bubbleSort(std::vector<Complex>& vec) {
     bool swapped;
     do {
@@ -92,6 +94,7 @@ void mergeSort(std::vector<Complex>& vec, size_t left, size_t right) {
         merge(vec, left, mid, right);
     }
 }
+
 std::vector<Complex> rangeSearch(const std::vector<Complex>& vec, double m1, double m2) {
     std::vector<Complex> result;
     for (const auto& num : vec) {
@@ -101,6 +104,7 @@ std::vector<Complex> rangeSearch(const std::vector<Complex>& vec, double m1, dou
     }
     return result;
 }
+
 int main() {
     std::vector<Complex> vec = {Complex(1, 2), Complex(3, 4), Complex(5, 6), Complex(7, 8), Complex(1, 2)};
     Complex num(1, 2);
