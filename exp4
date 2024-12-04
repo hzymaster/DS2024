@@ -1,0 +1,157 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+
+using namespace std;
+
+class Graph {
+    int V; // 顶点数
+    vector<int> *adj; // 邻接表
+
+public:
+    Graph(int V) {
+        this->V = V;
+        adj = new vector<int>[V];
+    }
+
+    void addEdge(int v, int w) {
+        adj[v].push_back(w); // 添加无向边
+        adj[w].push_back(v);
+    }
+
+    void BFS(int s);
+    void DFS(int v);
+    void Dijkstra(int src);
+    void Prim();
+};
+
+void Graph::BFS(int s) {
+    bool *visited = new bool[V];
+    fill(visited, visited + V, false);
+
+    queue<int> q;
+
+    visited[s] = true;
+    q.push(s);
+
+    while (!q.empty()) {
+        s = q.front();
+        cout << s << " ";
+        q.pop();
+
+        for (int i = 0; i < adj[s].size(); i++) {
+            if (!visited[adj[s][i]]) {
+                visited[adj[s][i]] = true;
+                q.push(adj[s][i]);
+            }
+        }
+    }
+    delete[] visited;
+}
+
+void Graph::DFS(int v) {
+    bool *visited = new bool[V];
+    fill(visited, visited + V, false);
+
+    function<void(int)> DFSHelper = [&](int v) {
+        visited[v] = true;
+        cout << v << " ";
+        for (int i = 0; i < adj[v].size(); i++) {
+            if (!visited[adj[v][i]]) {
+                DFSHelper(adj[v][i]);
+            }
+        }
+    };
+
+    DFSHelper(v);
+    delete[] visited;
+}
+
+void Graph::Dijkstra(int src) {
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    int *dist = new int[V];
+    fill(dist, dist + V, INT_MAX);
+    dist[src] = 0;
+    pq.push(make_pair(0, src));
+
+    while (!pq.empty()) {
+        int u = pq.top().second;
+        pq.pop();
+
+        for (int i = 0; i < adj[u].size(); i++) {
+            int v = adj[u][i];
+            if (!pq.empty() && dist[u] != INT_MAX && dist[v] > dist[u] + 1) {
+                dist[v] = dist[u] + 1;
+                pq.push(make_pair(dist[v], v));
+            }
+        }
+    }
+
+    cout << "Vertex Distance from Source\n";
+    for (int i = 0; i < V; i++)
+        cout << i << " \t\t " << dist[i] << endl;
+
+    delete[] dist;
+}
+
+void Graph::Prim() {
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    int *key = new int[V];
+    int *parent = new int[V];
+    bool *inMST = new bool[V];
+
+    for (int i = 0; i < V; i++) {
+        key[i] = INT_MAX;
+        inMST[i] = false;
+    }
+
+    key[0] = 0;
+    pq.push(make_pair(0, 0));
+
+    while (!pq.empty()) {
+        int u = pq.top().second;
+        pq.pop();
+        inMST[u] = true;
+
+        for (int i = 0; i < adj[u].size(); i++) {
+            int v = adj[u][i];
+            if (!inMST[v] && key[u] != INT_MAX && key[v] > key[u] + 1) {
+                key[v] = key[u] + 1;
+                pq.push(make_pair(key[v], v));
+                parent[v] = u;
+            }
+        }
+    }
+
+    cout << "Edge \t Weight\n";
+    for (int i = 1; i < V; i++)
+        cout << parent[i] << " - " << i << " \t" << key[i] << endl;
+
+    delete[] key;
+    delete[] parent;
+    delete[] inMST;
+}
+
+int main() {
+    Graph g(5);
+    g.addEdge(0, 1);
+    g.addEdge(0, 2);
+    g.addEdge(1, 2);
+    g.addEdge(1, 3);
+    g.addEdge(2, 4);
+
+    cout << "BFS starting from vertex 0:\n";
+    g.BFS(0);
+
+    cout << "\nDFS starting from vertex 0:\n";
+    g.DFS(0);
+
+    cout << "\nDijkstra's shortest path from vertex 0:\n";
+    g.Dijkstra(0);
+
+    cout << "\nMinimum Spanning Tree (Prim's algorithm):\n";
+    g.Prim();
+
+    return 0;
+}
